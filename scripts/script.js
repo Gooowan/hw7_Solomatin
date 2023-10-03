@@ -13,16 +13,19 @@ document.addEventListener('DOMContentLoaded', function() {
             li.classList.add('completed');
         }
         li.innerHTML = `
-            <span class="checkbox" data-index="${index}">${task.completed ? '✅' : '❌'}</span>
-            <span class="task-text" data-index="${index}">${task.text}</span>
-            <button class="remove-btn" style="margin-top: 5px" data-index="${index}">Remove</button>
+        <span class="checkbox" data-index="${index}">${task.completed ? '✅' : '❌'}</span>
+        <span class="task-text" data-index="${index}">${task.text}</span>
+        <span class="days-to-deadline" data-index="${index}">${task.daysToDeadline} </span>
+        <input type="number" class="edit-deadline-input" data-index="${index}" style="display:none;" min="1" value="${task.daysToDeadline}">
+        <button class="edit-deadline-btn" data-index="${index}">Edit Deadline</button>
+        <button class="remove-btn" style="margin-top: 5px" data-index="${index}">Remove</button>
         `;
         return li;
     }
 
     function renderTasks() {
         taskList.innerHTML = '';
-       tasks.sort((a, b) => b.date - a.date);
+       tasks.sort((a, b) => a.daysToDeadline - b.daysToDeadline);
         tasks.forEach((task, index) => {
             taskList.appendChild(createTaskElement(task, index));
         });
@@ -49,7 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
             tasks.unshift({
                 text: taskInput.value.trim(),
                 date: new Date(),
-                completed: false
+                completed: false,
+                daysToDeadline: "No deadline set"
             });
         }
         taskInput.value = '';
@@ -93,4 +97,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     renderTasks();
+
+    taskList.addEventListener('click', function(e) {
+        if (e.target.classList.contains('edit-deadline-btn')) {
+            const index = e.target.dataset.index;
+            const inputElem = document.querySelector(`.edit-deadline-input[data-index="${index}"]`);
+            const spanElem = document.querySelector(`.days-to-deadline[data-index="${index}"]`);
+            inputElem.style.display = "inline";
+            spanElem.style.display = "none";
+            inputElem.focus();
+        }
+    });
+
+    // Event listener to handle changes to the deadline input
+    // Event listener to handle changes to the deadline input
+    taskList.addEventListener('blur', function(e) {
+        if (e.target.classList.contains('edit-deadline-input')) {
+            const index = e.target.dataset.index;
+
+            // Store the input value with the "days to deadline" text
+            tasks[index].daysToDeadline = `${parseInt(e.target.value, 10)} days to deadline`;
+
+            const spanElem = document.querySelector(`.days-to-deadline[data-index="${index}"]`);
+            spanElem.textContent = tasks[index].daysToDeadline;
+            e.target.style.display = "none";
+            spanElem.style.display = "inline";
+            renderTasks();
+        }
+    }, true);
+
+
+
 });
+
+
