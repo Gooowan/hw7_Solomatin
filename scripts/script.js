@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
             li.classList.add('completed');
         }
         li.innerHTML = `
-        <span class="checkbox" data-index="${index}">${task.completed ? '✅' : '❌'}</span>
-        <span class="task-text" data-index="${index}">${task.text}</span>
+        <span class="checkbox" style="margin-left: 10px" data-index="${index}">${task.completed ? '✅' : '❌'}</span>
+        <span class="task-text" data-index="${index}" style="display:inline;">${task.text}</span>
+        <input type="text" class="edit-task-input" data-index="${index}" style="display:none;" value="${task.text}">
         <span class="days-to-deadline" data-index="${index}">${task.daysToDeadline} </span>
         <input type="number" class="edit-deadline-input" data-index="${index}" style="display:none;" min="1" value="${task.daysToDeadline}">
         <button class="edit-deadline-btn" data-index="${index}">Edit Deadline</button>
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderTasks() {
         taskList.innerHTML = '';
-       tasks.sort((a, b) => a.daysToDeadline - b.daysToDeadline);
+        tasks.sort((a, b) => a.daysToDeadline - b.daysToDeadline);
         tasks.forEach((task, index) => {
             taskList.appendChild(createTaskElement(task, index));
         });
@@ -34,11 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function addOrUpdateTask(e, editIndex = null) {
         if ((e.keyCode && e.keyCode !== 13 && e.keyCode !== 27) || !taskInput.value.trim()) return;
 
-        // The key code: Enter - 13, ESC is 27
-
         if (e.keyCode === 27) {
             taskInput.value = '';
-       saveTaskBtn.onclick = addOrUpdateTask;
+            saveTaskBtn.onclick = addOrUpdateTask;
             return;
         }
 
@@ -57,13 +56,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         taskInput.value = '';
-       saveTaskBtn.onclick = addOrUpdateTask;
+        saveTaskBtn.onclick = addOrUpdateTask;
         renderTasks();
     }
 
     taskList.addEventListener('click', function(e) {
         const index = e.target.dataset.index;
-        if (e.target.classList.contains('checkbox') || e.target.classList.contains('task-text')) {
+        if (e.target.classList.contains('checkbox')) {
             tasks[index].completed = !tasks[index].completed;
             renderTasks();
         } else if (e.target.classList.contains('remove-btn')) {
@@ -73,11 +72,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     taskList.addEventListener('dblclick', function(e) {
+        e.preventDefault();
+        const index = e.target.dataset.index;
         if (e.target.classList.contains('task-text')) {
-            const index = e.target.dataset.index;
-            taskInput.value = tasks[index].text;
-            taskInput.focus();
-            saveTaskBtn.onclick = (e) => addOrUpdateTask(e, index);
+            const inputElem = document.querySelector(`.edit-task-input[data-index="${index}"]`);
+            const spanElem = e.target;
+
+            spanElem.style.display = "none";
+            inputElem.style.display = "inline";
+            inputElem.focus();
         }
     });
 
@@ -125,8 +128,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, true);
 
+    taskList.addEventListener('blur', function(e) {
+        if (e.target.classList.contains('edit-task-input')) {
+            const index = e.target.dataset.index;
+            tasks[index].text = e.target.value.trim();
 
-
+            const spanElem = document.querySelector(`.task-text[data-index="${index}"]`);
+            spanElem.textContent = tasks[index].text;
+            e.target.style.display = "none";
+            spanElem.style.display = "inline";
+        }
+    }, true);
 });
-
-

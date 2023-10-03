@@ -36,6 +36,15 @@ h1 {
     border: none;
 }
 
+.edit-task-input {
+    padding: 5px 10px;
+    color: black;
+    background: transparent;
+    font-size: 14px;
+    margin-right: 10px;
+    border-radius: 4px;
+    border: none;
+}
 
 #task-input {
     flex: 1;
