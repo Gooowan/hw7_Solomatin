@@ -110,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Event listener to handle changes to the deadline input
-    // Event listener to handle changes to the deadline input
     taskList.addEventListener('blur', function(e) {
         if (e.target.classList.contains('edit-deadline-input')) {
             const index = e.target.dataset.index;
