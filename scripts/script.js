@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderTasks() {
         taskList.innerHTML = '';
+       tasks.sort((a, b) => b.date - a.date);
         tasks.forEach((task, index) => {
             taskList.appendChild(createTaskElement(task, index));
         });
@@ -34,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (e.keyCode === 27) {
             taskInput.value = '';
+       saveTaskBtn.onclick = addOrUpdateTask;
             return;
         }
 
@@ -51,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         taskInput.value = '';
+       saveTaskBtn.onclick = addOrUpdateTask;
         renderTasks();
     }
 
@@ -67,7 +70,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     taskList.addEventListener('dblclick', function(e) {
         if (e.target.classList.contains('task-text')) {
-            taskInput.value = tasks[e.target.dataset.index].text;
+            const index = e.target.dataset.index;
+            taskInput.value = tasks[index].text;
+            taskInput.focus();
+            saveTaskBtn.onclick = (e) => addOrUpdateTask(e, index);
         }
     });
 
